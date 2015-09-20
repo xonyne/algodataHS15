@@ -2,7 +2,9 @@ package examples;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 
 public class MergeSort {
@@ -19,17 +21,17 @@ public class MergeSort {
 		// rand.setSeed(54326346); // initialize always in the same state
 		ThreadMXBean threadBean = ManagementFactory.getThreadMXBean();
 		// new array
-		int[] a = new int[n];
+		List<Integer> a = new ArrayList<Integer>();
 		// fill it randomly
-		for (int i = 0; i < a.length; i++)
-			a[i] = rand.nextInt(n);
+		for (int i = 0; i < a.size(); i++)
+			a.add(rand.nextInt(n));
 		cnt = 0; // for statistcs reasons
 		// get Time
 		te1 = System.currentTimeMillis();
 		t1 = threadBean.getCurrentThreadCpuTime();
-		System.out.println("Before sorting: " + Arrays.toString(a));
+		System.out.println("Before sorting: " + a);
 		a = mergeSort(a);
-		System.out.println("After sorting: " + Arrays.toString(a));
+		System.out.println("After sorting: " + a);
 		te2 = System.currentTimeMillis();
 		t2 = threadBean.getCurrentThreadCpuTime();
 		time = t2 - t1;
@@ -39,35 +41,34 @@ public class MergeSort {
 		System.out.println("sorted? " + isSorted(a));
 	}
 
-	public static boolean isSorted(int[] a) {
-		for (int i = 0; i < a.length - 1; i++) {
-			if (a[i] > a[i + 1])
+	public static boolean isSorted(List<Integer> a) {
+		for (int i = 0; i < a.size() - 1; i++) {
+			if (a.get(i) > a.get(i + 1))
 				return false;
 		}
 		return true;
 	}
 
-	private static int[] mergeSort(int[] intArray) {
-		if (intArray.length <= 1)
-			return intArray;
+	private static List<Integer> mergeSort(List<Integer> intList) {
+		if (intList.size() <= 1)
+			return intList;
 		else {
-			int half = intArray.length / 2;
-			int[] leftList = Arrays.copyOfRange(intArray, 0, half);
-			int[] rightList = Arrays.copyOfRange(intArray, half,
-					intArray.length);
-			mergeSort(leftList);
-			mergeSort(rightList);
-			return merge(leftList, rightList);
+			int half = intList.size() / 2;
+			List<Integer> leftPart = intList.subList(0, half);
+			List<Integer> rightPart = intList.subList(half, intList.size());
+			mergeSort(leftPart);
+			mergeSort(rightPart);
+			return merge(leftPart,rightPart);
 		}
 
 	}
 
-	private static int[] merge(int[] leftList, int[] rightList) {
-		int[] sortedList = new int[leftList.length + rightList.length];
+	private static List<Integer> merge(List<Integer> leftList, List<Integer> rightList) {
+		List<Integer> sortedList = new ArrayList<Integer>();
 		int insertIndex = 0;
 
-		while (leftList.length > 0 && rightList.length > 0) {
-			if (leftList[0] >= rightList[0]) {
+		while (leftList.size() > 0 && rightList.size() > 0) {
+			if (leftList.get(0) >= rightList.get(0)) {
 				copyAndRemoveFirstElement(leftList, sortedList, insertIndex);
 			} else {
 				copyAndRemoveFirstElement(rightList, sortedList, insertIndex);
@@ -75,26 +76,20 @@ public class MergeSort {
 			insertIndex++;
 		}
 
-		while (leftList.length > 0) {
+		while (leftList.size() > 0) {
 			copyAndRemoveFirstElement(leftList, sortedList, insertIndex);
 		}
 
-		while (rightList.length > 0) {
+		while (rightList.size() > 0) {
 			copyAndRemoveFirstElement(rightList, sortedList, insertIndex);
 		}
-
+		
 		return sortedList;
 	}
 
-	private static void copyAndRemoveFirstElement(int[] arrayToRemove,
-			int[] arrayToInsert, int insertIndex) {
-		arrayToInsert[insertIndex] = arrayToRemove[0];
-		
-		int[] tmpArray = new int[arrayToRemove.length - 1];
-		for (int i=1; i<arrayToRemove.length;i++){
-			tmpArray[i] = arrayToRemove[i];
-		}
-		arrayToRemove=tmpArray;
-		System.out.println(Arrays.toString(arrayToRemove));
+	private static void copyAndRemoveFirstElement(List listToRemove,
+			List listToInsert, int insertIndex) {
+		listToInsert.set(insertIndex, listToRemove.get(0));
+		listToRemove.remove(0);
 }
 }
